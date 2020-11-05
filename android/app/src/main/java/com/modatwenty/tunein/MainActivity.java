@@ -15,8 +15,9 @@ import androidx.palette.graphics.Palette;
 
 import android.media.MediaMetadataRetriever;
 
-import io.flutter.app.FlutterActivity;
-import io.flutter.plugin.common.MethodCall;
+import androidx.annotation.NonNull;
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 
@@ -86,118 +87,114 @@ public class MainActivity extends FlutterActivity {
     return null;
   }
 
-
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    GeneratedPluginRegistrant.registerWith(this);
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+            GeneratedPluginRegistrant.registerWith(flutterEngine);
+            new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
+              .setMethodCallHandler(
+                  (methodCall, result) -> {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    if (methodCall.method.equals("sendToBackground")) {
+                      moveTaskToBack(true);
+                    }
 
+                    if (methodCall.method.equals("getStoragePath")) {
+                      String path = Environment.getDataDirectory().toString();
+                      result.success(path);
+                    }
 
-    methodChannel = new MethodChannel(getFlutterView(), CHANNEL);
-    methodChannel.setMethodCallHandler(new MethodChannel.MethodCallHandler() {
-      @Override
-      public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-        Map<String, Object> arguments = methodCall.arguments();
-        if (methodCall.method.equals("sendToBackground")) {
-          moveTaskToBack(true);
+                    if(methodCall.method.equals("getSDCardPermission")){
+                      takeCardUriPermission(getExternalCacheDirs()[1].toString());
+                      result.success(true);
+                    }
+
+                    if(methodCall.method.equals("saveFileFromBytes")){
+                      String filepath = (String) arguments.get("filepath");
+                      final byte[] bytes = methodCall.argument("bytes");
+
+                      try{
+                        if(filepath==null || bytes==null)throw new Exception("Arguments Not found");
+                        filepath=filepath.replace("%20"," ");
+                        DocumentFile documentFile = DocumentFile.fromTreeUri(getApplicationContext(), getUri());
+                        String[] parts = filepath.split("/");
+                        for (int i = 0; i < parts.length; i++) {
+                          if(documentFile.findFile(parts[i])!=null){
+                            documentFile=documentFile.findFile(parts[i]);
+                          }
+                        }
+                        if(documentFile!=null && documentFile.isFile()){
+                          OutputStream out = getContentResolver().openOutputStream(documentFile.getUri());
+                          out.write(bytes);
+                          out.close();
+                        }else{
+                          throw new Exception("File Not Found");
+                        }
+                      }catch (Exception e){
+                        result.error("400",e.getMessage(),e);
+                        return;
+                      }
+                      result.success(true);
+                    }
+
+                    if (methodCall.method.equals("getMetaData")) {
+                      String filepath = (String) arguments.get("filepath");
+                      System.out.println(filepath);
+                      List l = new ArrayList();
+                      mmr.setDataSource(filepath);
+                      l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+                      l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+                      try {
+                        l.add(mmr.getEmbeddedPicture());
+                      } catch (Exception e) {
+                        l.add("");
+                      }
+
+                      l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+                      l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER));
+                      l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+                      result.success(l);
+                    }
+
+                    if (methodCall.method.equals("getSdCardPath")) {
+                      String removableStoragePath = null;
+                      try {
+                        removableStoragePath = getExternalCacheDirs()[1].toString();
+                      } catch (Exception e) {
+                      }
+                      result.success(removableStoragePath);
+                    }
+
+                    if (methodCall.method.equals("getColor")) {
+                      String path = methodCall.argument("path");
+
+                      Bitmap myBitmap = BitmapFactory.decodeFile(path);
+                      // int color = getDominantColor(myBitmap);
+                      // String text = methodCall.argument("path");
+                      // result.success(color);
+
+                      Palette.generateAsync(myBitmap, new Palette.PaletteAsyncListener() {
+                        int defaultColor = 0x000000;
+                        List<Integer> colors = new ArrayList<Integer>();
+
+                        public void onGenerated(Palette palette) {
+                          Palette.Swatch dominantSwatch = palette.getDominantSwatch();
+
+                          int backgroundColor = dominantSwatch.getRgb();
+                          int textColor = dominantSwatch.getBodyTextColor();
+                          int titleColor = dominantSwatch.getTitleTextColor();
+
+                          colors.add(backgroundColor);
+                          colors.add(titleColor);
+                          colors.add(textColor);
+
+                          result.success(colors);
+                        }
+                      });
+                    }
+
+                  }
+              );
         }
 
-        if (methodCall.method.equals("getStoragePath")) {
-          String path = Environment.getDataDirectory().toString();
-          result.success(path);
-        }
 
-        if(methodCall.method.equals("getSDCardPermission")){
-          takeCardUriPermission(getExternalCacheDirs()[1].toString());
-          result.success(true);
-        }
-
-        if(methodCall.method.equals("saveFileFromBytes")){
-          String filepath = (String) arguments.get("filepath");
-          final byte[] bytes = methodCall.argument("bytes");
-
-          try{
-            if(filepath==null || bytes==null)throw new Exception("Arguments Not found");
-            filepath=filepath.replace("%20"," ");
-            DocumentFile documentFile = DocumentFile.fromTreeUri(getApplicationContext(), getUri());
-            String[] parts = filepath.split("/");
-            for (int i = 0; i < parts.length; i++) {
-              if(documentFile.findFile(parts[i])!=null){
-                documentFile=documentFile.findFile(parts[i]);
-              }
-            }
-            if(documentFile!=null && documentFile.isFile()){
-              OutputStream out = getContentResolver().openOutputStream(documentFile.getUri());
-              out.write(bytes);
-              out.close();
-            }else{
-              throw new Exception("File Not Found");
-            }
-          }catch (Exception e){
-            result.error("400",e.getMessage(),e);
-            return;
-          }
-          result.success(true);
-        }
-
-        if (methodCall.method.equals("getMetaData")) {
-          String filepath = (String) arguments.get("filepath");
-          System.out.println(filepath);
-          List l = new ArrayList();
-          mmr.setDataSource(filepath);
-          l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-          l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-          try {
-            l.add(mmr.getEmbeddedPicture());
-          } catch (Exception e) {
-            l.add("");
-          }
-          
-          l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
-          l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER));
-          l.add(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-          result.success(l);
-        } 
-
-        if (methodCall.method.equals("getSdCardPath")) {
-          String removableStoragePath = null;
-          try {
-            removableStoragePath = getExternalCacheDirs()[1].toString();
-          } catch (Exception e) {
-          }
-          result.success(removableStoragePath);
-        }
-
-        if (methodCall.method.equals("getColor")) {
-          String path = methodCall.argument("path");
-
-          Bitmap myBitmap = BitmapFactory.decodeFile(path);
-          // int color = getDominantColor(myBitmap);
-          // String text = methodCall.argument("path");
-          // result.success(color);
-
-          Palette.generateAsync(myBitmap, new Palette.PaletteAsyncListener() {
-            int defaultColor = 0x000000;
-            List<Integer> colors = new ArrayList<Integer>();
-
-            public void onGenerated(Palette palette) {
-              Palette.Swatch dominantSwatch = palette.getDominantSwatch();
-
-              int backgroundColor = dominantSwatch.getRgb();
-              int textColor = dominantSwatch.getBodyTextColor();
-              int titleColor = dominantSwatch.getTitleTextColor();
-
-              colors.add(backgroundColor);
-              colors.add(titleColor);
-              colors.add(textColor);
-
-              result.success(colors);
-            }
-          });
-        }
-
-      }
-    });
-
-  }
 }
