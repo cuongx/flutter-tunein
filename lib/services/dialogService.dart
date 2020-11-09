@@ -302,7 +302,7 @@ class DialogService{
   }
 
 
-  static Future<bool> showPersistentDialog(context, {String message, Color titleColor, Color messageColor ,String title, Widget content, EdgeInsets padding, bool showCancelAction = false}){
+  static Future<dynamic> showPersistentDialog(context, {String message, Color titleColor, Color messageColor ,String title, Widget content, EdgeInsets padding= const EdgeInsets.all(24), bool showCancelAction = false}){
     return showDialog(
         context: context,
         barrierDismissible: false,

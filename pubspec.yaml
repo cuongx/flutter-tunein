@@ -73,6 +73,9 @@ dependencies:
   tunein_image_utils_plugin:
     git:
       url: https://github.com/moda20/tunein_image_utils_plugin
+
+  media_gallery: ^0.1.5
+  extended_tabs: ^0.2.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

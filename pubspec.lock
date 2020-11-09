@@ -157,6 +157,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  extended_tabs:
+    dependency: "direct main"
+    description:
+      name: extended_tabs
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   fading_edge_scrollview:
     dependency: "direct main"
     description:
@@ -307,6 +314,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.10-nullsafety.1"
+  media_gallery:
+    dependency: "direct main"
+    description:
+      name: media_gallery
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.5"
   media_notification:
     dependency: "direct main"
     description:

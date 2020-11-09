@@ -90,8 +90,8 @@ public class MainActivity extends FlutterActivity {
   @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
             GeneratedPluginRegistrant.registerWith(flutterEngine);
-            new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
-              .setMethodCallHandler(
+    methodChannel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL);
+    methodChannel.setMethodCallHandler(
                   (methodCall, result) -> {
                     Map<String, Object> arguments = methodCall.arguments();
                     if (methodCall.method.equals("sendToBackground")) {
