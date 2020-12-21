@@ -1311,6 +1311,55 @@ class MusicService {
     }
   }
 
+  Future<bool> saveAlbumInfo(Album newAlbum, Album oldAlbum){
+    if(newAlbum!=null){
+      List<Tune> newSongList = songs$.value;
+      List<String> newSongsIds = newAlbum.songs.map((e) => e.id).toList();
+      Map<String, Tune> newSongsById = newAlbum.songs.asMap().map((key,value)=>MapEntry<String, Tune>(value.id,value));
+      //Map between the index of the newAlbum songs index and app song list
+      Map<int,int> indexOfSongsToReplace = new Map();
+      newSongList.asMap().map((key, value) => MapEntry(value.id,key)).forEach((key, value) {
+        for(int i=0; i<newSongsIds.length; i++){
+          if(newSongsIds[i] == key){
+            indexOfSongsToReplace[i]=value;
+            break;
+          }
+        }
+      });
+      indexOfSongsToReplace.forEach((key,value){
+        newSongList[value] = newAlbum.songs[key];
+      });
+
+      return saveFiles(songsToSave: newSongList).then((value){
+        songs$.add(newSongList);
+        print("gona add songs to the stream now");
+        print("gona fectchAlbums now");
+        return fetchAlbums();
+      }).then((data){
+        print("gona fetchArtist now");
+        return updateArtist(artistNames: [newAlbum.artist,oldAlbum.artist]);
+      }).then((data){
+        print("gona save artists now");
+        return saveArtists();
+      }).then((value){
+        return Future.wait(newAlbum.songs.map((e) => FileService.writeTags(e)).toList());
+      }).then((value) async {
+        //Here we need to refresh multiple values
+        //The first would be the lastSongPlayed that is saved to the storage with a separate reference
+        oldAlbum.songs.forEach((element) async{
+          bool songRemoved = await metricService.removeSongFromLatestPlayedSongs(null,title: element.title);
+          if(songRemoved){
+            return  metricService.addSongToLatestPlayedSongs(newSongsById[element.id]);
+          }
+        });
+
+        return true;
+      }).then((value) => true);
+    }else{
+      return null;
+    }
+  }
+
   Future<bool> getArtistDataAndSaveIt() async{
     if(SettingsService.settings$.value[SettingsIds.SET_ARTIST_THUMB_UPDATE]=="true"){
       if(_artists$.value.length!=0){

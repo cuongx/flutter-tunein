@@ -10,7 +10,9 @@ import 'package:Tunein/components/pageheader.dart';
 import 'package:Tunein/components/scrollbar.dart';
 import 'package:Tunein/components/common/selectableTile.dart';
 import 'package:Tunein/components/songInfoWidget.dart';
+import 'package:Tunein/components/threeDotPopupMenu.dart';
 import 'package:Tunein/globals.dart';
+import 'package:Tunein/models/ContextMenuOption.dart';
 import 'package:Tunein/models/playerstate.dart';
 import 'package:Tunein/plugins/nano.dart';
 import 'package:Tunein/services/castService.dart';
@@ -118,20 +120,80 @@ class SingleAlbumPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                (album.title == null)
-                                    ? "Unknon Title"
-                                    : album.title,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(
-                                  fontSize: 17.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: bgColor!=null?Color(bgColor[2]).withAlpha(200):Colors.white,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Text(
+                                      (album.title == null)
+                                          ? "Unknon Title"
+                                          : album.title,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        fontSize: 17.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: bgColor!=null?Color(bgColor[2]).withAlpha(200):Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Material(
+                                  child: PopupMenuButton<ContextMenuOptions>(
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        splashColor: MyTheme.darkgrey,
+                                        radius: 30.0,
+                                        child: Padding(
+                                            padding: const EdgeInsets.only(right: 10.0),
+                                            child:Icon(
+                                              IconData(0xea7c, fontFamily: 'boxicons'),
+                                              size: 22,
+                                              color: bgColor!=null?Color(bgColor[2]).withAlpha(200):Colors.white70,
+                                            )
+                                        ),
+                                      ),
+                                    ),
+                                    elevation: 3.2,
+                                    onCanceled: () {
+                                      print('You have not chosen anything');
+                                    },
+                                    tooltip: 'Playing options',
+                                    onSelected: (ContextMenuOptions choice){
+                                      switch(choice.id){
+                                        case 1: {
+                                          musicService.playEntireAlbum(album);
+                                          break;
+                                        }
+                                        case 2:{
+                                          musicService.shuffleEntireAlbum(album);
+                                          break;
+                                        }
+                                        case 3:{
+                                          musicService.shuffleEntireAlbum(album);
+                                          break;
+                                        }
+                                      }
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      List<PopupMenuItem<ContextMenuOptions>> itemList = albumCardContextMenulist.map((ContextMenuOptions choice) {
+                                        return PopupMenuItem<ContextMenuOptions>(
+                                          value: choice,
+                                          child: Text(choice.title),
+                                        );
+                                      }).toList();
+                                      itemList.add(PopupMenuItem<ContextMenuOptions>(
+                                        value: ContextMenuOptions(title: "Edit Album Tags", id: 3, icon: Icons.edit),
+                                        child: Text("Edit Album Tags"),
+                                      ));
+                                      return ;
+                                    },
+                                  ),
+                                  color: Colors.transparent,
+                                )
+                              ],
                             ),
                             Text(
                               (album.artist == null)
