@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:Tunein/components/customPageView.dart';
 import 'package:Tunein/pages/single/singlePlaylistPage.dart';
 import 'package:Tunein/plugins/nano.dart';
 import 'package:Tunein/services/locator.dart';
@@ -49,14 +50,14 @@ class NowPlayingScreenState extends State<NowPlayingScreen> {
     final _screenHeight = MediaQuery.of(context).size.height;
     BehaviorSubject<Tune> songStream = new BehaviorSubject<Tune>();
     Tune song;
-    return PageView(
+    return CustomPageView(
       controller: widget.controller,
-      children: <Widget>[
+      shallowWidget : Container(color:MyTheme.bgBottomBar),
+      pages: <Widget>[
         playingQueue(),
         PlayingPage(songStream),
         AlbumSongs(songStream: musicService.playerState$),
       ],
-      physics: ClampingScrollPhysics(),
     );
   }
 }

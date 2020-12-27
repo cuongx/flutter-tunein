@@ -45,88 +45,93 @@ class AlbumGridCell extends StatelessWidget {
         if(snapshot.hasData) {
           songColors=snapshot.data;
         }
+        Widget cellColumn = Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            album.albumArt == null ? Image.asset("images/cover.png",height: imageHeight+2,fit: BoxFit.cover,) : FadeInImage(
+              image: FileImage(File(album.albumArt)),
+              fit: BoxFit.fill,
+              height: imageHeight+2,
+              placeholder: AssetImage("images/cover.png"),
+            ),
+            Expanded(
+              child: Container(
+                color: MyTheme.darkgrey,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  width: double.infinity,
+                  color: songColors!=null?new Color(songColors[0]).withAlpha(225):MyTheme.darkgrey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 3, left: 2),
+                        child: Text(
+                            album.title!=null?album.title:"Unknown Title",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              color: (songColors!=null?new Color(songColors[1]):Colors.white70).withOpacity(.7),
+                            ),
+                            strutStyle: StrutStyle(
+                                height: 0.95,
+                                forceStrutHeight: true
+                            )
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Expanded(
+                            flex:9,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Text(
+                                album.artist!=null?album.artist:"Unknown Artist",
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.left,
+                                strutStyle: StrutStyle(
+                                    height: 0.8,
+                                    forceStrutHeight: true
+                                ),
+                                style: TextStyle(
+                                    fontSize: 12.5,
+                                    color: (songColors!=null?new Color(songColors[1]):Colors.white70).withOpacity(.7)
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child:  choices!=null?ThreeDotPopupMenu(
+                              IconColor: (songColors!=null?new Color(songColors[1]):Color(0xffffffff)).withOpacity(.7)  ,
+                              choices: choices,
+                              onContextSelect: onContextSelect,
+                              screenSize: Screensize,
+                              staticOffsetFromBottom: StaticContextMenuFromBottom,
+                            ):Container(),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ],
+        );
+        if(animationDelayComputed==0){
+          return cellColumn;
+        }
         return AnimatedSwitcher(
           reverseDuration: Duration(milliseconds: animationDelayComputed),
           duration: Duration(milliseconds: animationDelayComputed),
             switchInCurve: Curves.easeInToLinear,
-            child: !snapshot.hasData?shallowWidget:Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                album.albumArt == null ? Image.asset("images/cover.png",height: imageHeight+2,fit: BoxFit.cover,) : Image(
-                  image: FileImage(File(album.albumArt)),
-                  fit: BoxFit.fill,
-                  height: imageHeight+2,
-                ),
-                Expanded(
-                  child: Container(
-                    color: MyTheme.darkgrey,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      width: double.infinity,
-                      color: songColors!=null?new Color(songColors[0]).withAlpha(225):MyTheme.darkgrey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 3, left: 2),
-                            child: Text(
-                              album.title!=null?album.title:"Unknown Title",
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                color: (songColors!=null?new Color(songColors[1]):Colors.white70).withOpacity(.7),
-                              ),
-                                strutStyle: StrutStyle(
-                                    height: 0.95,
-                                    forceStrutHeight: true
-                                )
-                            ),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Expanded(
-                                flex:9,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 2),
-                                  child: Text(
-                                    album.artist!=null?album.artist:"Unknown Artist",
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.left,
-                                    strutStyle: StrutStyle(
-                                        height: 0.8,
-                                        forceStrutHeight: true
-                                    ),
-                                    style: TextStyle(
-                                        fontSize: 12.5,
-                                        color: (songColors!=null?new Color(songColors[1]):Colors.white70).withOpacity(.7)
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child:  choices!=null?ThreeDotPopupMenu(
-                                  IconColor: (songColors!=null?new Color(songColors[1]):Color(0xffffffff)).withOpacity(.7)  ,
-                                  choices: choices,
-                                  onContextSelect: onContextSelect,
-                                  screenSize: Screensize,
-                                  staticOffsetFromBottom: StaticContextMenuFromBottom,
-                                ):Container(),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ));
+            child: !snapshot.hasData?shallowWidget:cellColumn);
       },
     );
   }

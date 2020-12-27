@@ -23,15 +23,15 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final LanguageService = locator<languageService>();
+  //final LanguageService = locator<languageService>();
   @override
   Widget build(BuildContext context) {
-    LanguageService.flutterI18nDelegate.load(null);
+    //LanguageService.flutterI18nDelegate.load(null);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Tune In Music Player",
       localizationsDelegates: [
-        LanguageService.flutterI18nDelegate,
+        //LanguageService.flutterI18nDelegate,
       ],
       home: Wrapper(
         child: Column(

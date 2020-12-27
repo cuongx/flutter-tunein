@@ -1,3 +1,4 @@
+import 'package:Tunein/components/customPageView.dart';
 import 'package:Tunein/components/pagenavheader.dart';
 import 'package:Tunein/globals.dart';
 import 'package:Tunein/pages/library/albums.page.dart';
@@ -7,7 +8,6 @@ import 'package:Tunein/pages/single/LandingPage.dart';
 import 'package:Tunein/services/layout.dart';
 import 'package:Tunein/services/locator.dart';
 import 'package:flutter/material.dart';
-import 'package:preload_page_view/preload_page_view.dart';
 
 class LibraryPage extends StatelessWidget {
   LibraryPage({Key key}) : super(key: key);
@@ -33,15 +33,9 @@ class LibraryPage extends StatelessWidget {
             builder: (context, AsyncSnapshot snapshot){
               return AnimatedSwitcher(
                 duration: Duration(milliseconds: 300),
-                child: snapshot.hasData?PreloadPageView.builder(
-                  itemCount: 4,
-                  itemBuilder: (BuildContext context, int position){
-                    return children[position];
-                  },
-                  onPageChanged: (int position) {
-                      //print("position from the pagePloader: ${position}");
-                  },
-                  preloadPagesCount: 3,
+                child: snapshot.hasData?CustomPageView(
+                  shallowWidget: Container(color: MyTheme.bgBottomBar),
+                  pages: children,
                   controller: layoutService.pageServices[0].pageViewController,
                 ):shallowWidget,
               );

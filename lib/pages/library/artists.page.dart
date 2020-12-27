@@ -36,6 +36,7 @@ class _ArtistsPageState extends State<ArtistsPage> with AutomaticKeepAliveClient
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var size = MediaQuery.of(context).size;
     double artistGridCellHeight = uiScaleService.ArtistGridCellHeight(size);
     return Container(

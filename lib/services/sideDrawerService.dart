@@ -3,7 +3,7 @@ import 'package:Tunein/services/layout.dart';
 import 'package:Tunein/services/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
-import 'package:preload_page_view/preload_page_view.dart';
+//import 'package:preload_page_view/preload_page_view.dart';
 
 class SideDrawerService{
 

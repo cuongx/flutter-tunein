@@ -46,17 +46,12 @@ import 'package:flutter/services.dart';
 
 
 
-
-
-
-
-
 class LandingPage extends StatefulWidget {
-  @override
+
   _LandingPageState createState() => _LandingPageState();
 }
 
-class _LandingPageState extends State<LandingPage> {
+class _LandingPageState extends State<LandingPage> with AutomaticKeepAliveClientMixin<LandingPage> {
 
   final metricService = locator<MusicMetricsService>();
   final musicService = locator<MusicService>();
@@ -154,6 +149,7 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Size screenSize = MediaQuery.of(context).size;
     ScrollController queuWidgetController = new ScrollController();
     int currentSongIndex =0;
@@ -527,11 +523,7 @@ class _LandingPageState extends State<LandingPage> {
       builder: (context, AsyncSnapshot<List<List<int>>> snapshot){
         if(!snapshot.hasData){
           return Container(
-            child: PreferredPicks(
-              allImageBlur:false,
-              bottomTitle: "Most Played",
-              colors: [MyTheme.bgBottomBar.value, MyTheme.darkBlack.value],
-            ),
+           color: MyTheme.bgBottomBar,
           );
         }
         return GestureDetector(
@@ -558,10 +550,8 @@ class _LandingPageState extends State<LandingPage> {
               inCurve: Curves.easeIn,
               fadeDuration: Duration(milliseconds: 100),
               durationUntilFadeStarts: Duration(milliseconds: 350),
-              shallowWidget: PreferredPicks(
-                allImageBlur:false,
-                bottomTitle: "Most Played",
-                colors: [MyTheme.bgBottomBar.value, MyTheme.darkBlack.value],
+              shallowWidget: Container(
+                color: MyTheme.bgBottomBar,
               ),
             ),
           ),
@@ -574,6 +564,7 @@ class _LandingPageState extends State<LandingPage> {
                 context: context,
                 pageBuilder: (context, anim1, anim2){
                   return MultipleSongTapPopupWidget(
+                      context: context,
                       TopBackgroundWidget: getCombinedImages(snapshot.data, standardHeight: screensize.height*0.2, standardWidth: screensize.width*0.85, maxWidth: screensize.width*0.85),
                       screensize: screensize,
                       onShuffleButtonTap: (){
@@ -696,11 +687,7 @@ class _LandingPageState extends State<LandingPage> {
                 duration: Duration(milliseconds: 200),
                 switchInCurve: Curves.easeInToLinear,
                 child: !snapshot.hasData?Container(
-                  child: PreferredPicks(
-                    allImageBlur:false,
-                    bottomTitle: "Random Songs",
-                    colors: [MyTheme.grey300.value, MyTheme.darkBlack.value],
-                  ),
+                  color:MyTheme.bgBottomBar
                 ):GestureDetector(
                   child: Container(
                     margin: EdgeInsets.only(right: 8),
@@ -729,10 +716,8 @@ class _LandingPageState extends State<LandingPage> {
                       inCurve: Curves.easeIn,
                       fadeDuration: Duration(milliseconds: 100),
                       durationUntilFadeStarts: Duration(milliseconds: 350),
-                      shallowWidget: PreferredPicks(
-                        allImageBlur:false,
-                        bottomTitle: "Most Played",
-                        colors: [MyTheme.bgBottomBar.value, MyTheme.darkBlack.value],
+                      shallowWidget:Container(
+                        color: MyTheme.bgBottomBar,
                       ),
                     ),
                   ),
@@ -745,6 +730,7 @@ class _LandingPageState extends State<LandingPage> {
                         context: context,
                         pageBuilder: (context, anim1, anim2){
                           return MultipleSongTapPopupWidget(
+                            context: context,
                             listOfSongs: songsToChooseFrom,
                             TopwidgetBottomTitle: "Random Songs' List",
                             onPlaybuttonTap: (){
@@ -915,6 +901,7 @@ class _LandingPageState extends State<LandingPage> {
                                 context: context,
                                 pageBuilder: (context, anim1, anim2){
                                   return SinglePicturePopupWidget(
+                                      context: context,
                                       listOfSongs: AlbumSongs[index].songs,
                                       onPlaybuttonTap: (){
                                         musicService.updatePlaylist(AlbumSongs[index].songs);
@@ -947,7 +934,7 @@ class _LandingPageState extends State<LandingPage> {
                                                     child: Text(
                                                       AlbumSongs[index].songs.length.toString(),
                                                       style: TextStyle(
-                                                        color: (colors!=null && colors.length!=null)!=null?Color(colors[1]):Colors.white70,
+                                                        color: (colors!=null && colors.length!=0)!=null?Color(colors[1]):Colors.white70,
                                                         fontWeight: FontWeight.w700,
                                                         fontSize: 14,
                                                       ),
@@ -955,14 +942,14 @@ class _LandingPageState extends State<LandingPage> {
                                                   ),
                                                   Icon(
                                                     Icons.audiotrack,
-                                                    color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                    color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                   )
                                                 ],
                                               ),
                                               Container(
                                                 margin: EdgeInsets.only(right: 8, left :8),
                                                 width: 1,
-                                                color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                               ),
                                               Row(
                                                 mainAxisSize: MainAxisSize.min,
@@ -971,7 +958,7 @@ class _LandingPageState extends State<LandingPage> {
                                                     child: Text(
                                                       "${Duration(milliseconds: ConversionUtils.songListToDuration(AlbumSongs[index].songs).floor()).inMinutes} min",
                                                       style: TextStyle(
-                                                        color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                        color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                         fontWeight: FontWeight.w700,
                                                         fontSize: 14,
                                                       ),
@@ -980,14 +967,14 @@ class _LandingPageState extends State<LandingPage> {
                                                   ),
                                                   Icon(
                                                     Icons.access_time,
-                                                    color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                    color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                   )
                                                 ],
                                               ),
                                               Container(
                                                 margin: EdgeInsets.only(right: 8, left :8),
                                                 width: 4,
-                                                color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                               ),
                                             ],
                                           ),
@@ -1000,13 +987,13 @@ class _LandingPageState extends State<LandingPage> {
                                                   children: <Widget>[
                                                     Icon(
                                                       Icons.av_timer,
-                                                      color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                      color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                     ),
                                                     Container(
                                                       child: Text(
-                                                        "${ConversionUtils.DurationToFancyText(playDuration[AlbumSongs[index].id.toString()])} of play time",
+                                                        "${ConversionUtils.DurationToFancyText(playDuration[AlbumSongs[index].id.toString()]??Duration(milliseconds: 0))} of play time",
                                                         style: TextStyle(
-                                                          color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                          color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                           fontWeight: FontWeight.w700,
                                                           fontSize: 14,
                                                         ),
@@ -1131,6 +1118,7 @@ class _LandingPageState extends State<LandingPage> {
                                 context: context,
                                 pageBuilder: (context, anim1, anim2){
                                   return SinglePictureArtistPopupWidget(
+                                      context: context,
                                       artist: Artists[index],
                                       screensize: screensize,
                                       title: Artists[index].name,
@@ -1151,7 +1139,7 @@ class _LandingPageState extends State<LandingPage> {
                                                     child: Text(
                                                       Artists[index].albums.length.toString(),
                                                       style: TextStyle(
-                                                        color: (colors!=null && colors.length!=null)!=null?Color(colors[1]):Colors.white70,
+                                                        color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                         fontWeight: FontWeight.w700,
                                                         fontSize: 14,
                                                       ),
@@ -1159,14 +1147,14 @@ class _LandingPageState extends State<LandingPage> {
                                                   ),
                                                   Icon(
                                                     Icons.album,
-                                                    color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                    color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                   )
                                                 ],
                                               ),
                                               Container(
                                                 margin: EdgeInsets.only(right: 8, left :8),
                                                 width: 1,
-                                                color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                               ),
                                               Row(
                                                 mainAxisSize: MainAxisSize.min,
@@ -1178,7 +1166,7 @@ class _LandingPageState extends State<LandingPage> {
                                                         return value;
                                                       }).songs).floor()).inMinutes} min",
                                                       style: TextStyle(
-                                                        color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                        color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                         fontWeight: FontWeight.w700,
                                                         fontSize: 14,
                                                       ),
@@ -1187,14 +1175,14 @@ class _LandingPageState extends State<LandingPage> {
                                                   ),
                                                   Icon(
                                                     Icons.access_time,
-                                                    color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                    color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                   )
                                                 ],
                                               ),
                                               Container(
                                                 margin: EdgeInsets.only(right: 8, left :8),
                                                 width: 4,
-                                                color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                               ),
                                             ],
                                           ),
@@ -1207,13 +1195,13 @@ class _LandingPageState extends State<LandingPage> {
                                                   children: <Widget>[
                                                     Icon(
                                                       Icons.av_timer,
-                                                      color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                      color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                     ),
                                                     Container(
                                                       child: Text(
                                                         "${ConversionUtils.DurationToFancyText(Duration(seconds: playDuration[Artists[index].name]??0))} of play time",
                                                         style: TextStyle(
-                                                          color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                                          color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                                           fontWeight: FontWeight.w700,
                                                           fontSize: 14,
                                                         ),
@@ -1274,7 +1262,7 @@ class _LandingPageState extends State<LandingPage> {
     VoidCallback onShuffleButtonTap,
     List<Tune> listOfSongs = const [],
     String TopwidgetBottomTitle="",
-
+    context
   }){
 
     deckItemState={
@@ -1502,6 +1490,7 @@ class _LandingPageState extends State<LandingPage> {
     VoidCallback onShuffleButtonTap,
     List<int> colors,
     List<Tune> listOfSongs = const [],
+    context
   }){
     File imageFile = TopLeftWidget==null?topLeftImage!=null?File.fromUri(Uri.parse(topLeftImage)):null:TopLeftWidget;
     double popupWidth = screensize.width*0.85;
@@ -1585,7 +1574,7 @@ class _LandingPageState extends State<LandingPage> {
                                         child: Text(
                                           listOfSongs.length.toString(),
                                           style: TextStyle(
-                                            color: (colors!=null && colors.length!=null)!=null?Color(colors[1]):Colors.white70,
+                                            color: (colors!=null && colors.length!=0)!=null?Color(colors[1]):Colors.white70,
                                             fontWeight: FontWeight.w700,
                                             fontSize: 14,
                                           ),
@@ -1593,14 +1582,14 @@ class _LandingPageState extends State<LandingPage> {
                                       ),
                                       Icon(
                                         Icons.audiotrack,
-                                        color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                        color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                       )
                                     ],
                                   ),
                                   Container(
                                     margin: EdgeInsets.only(right: 8, left :8),
                                     width: 1,
-                                    color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                    color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                   ),
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -1609,7 +1598,7 @@ class _LandingPageState extends State<LandingPage> {
                                         child: Text(
                                           "${Duration(milliseconds: ConversionUtils.songListToDuration(listOfSongs).floor()).inMinutes} min",
                                           style: TextStyle(
-                                            color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                            color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                             fontWeight: FontWeight.w700,
                                             fontSize: 14,
                                           ),
@@ -1618,14 +1607,14 @@ class _LandingPageState extends State<LandingPage> {
                                       ),
                                       Icon(
                                         Icons.access_time,
-                                        color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                        color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                       )
                                     ],
                                   ),
                                   Container(
                                     margin: EdgeInsets.only(right: 8, left :8),
                                     width: 4,
-                                    color: (colors!=null && colors.length!=null)?Color(colors[1]):Colors.white70,
+                                    color: (colors!=null && colors.length!=0)?Color(colors[1]):Colors.white70,
                                   ),
                                 ],
                               )
@@ -1748,6 +1737,7 @@ class _LandingPageState extends State<LandingPage> {
     Widget underSubtitleTray,
     List<int> colors,
     Artist artist,
+    context
   }){
     File imageFile = TopLeftWidget==null?topLeftImage!=null?File.fromUri(Uri.parse(topLeftImage)):null:TopLeftWidget;
     double popupWidth = screensize.width*0.85;
@@ -1805,7 +1795,7 @@ class _LandingPageState extends State<LandingPage> {
                                   textAlign: TextAlign.center,
                                   maxLines: 1,
                                   style: TextStyle(
-                                      color: colors!=null?Color(colors[1]):MyTheme.grey300,
+                                      color: (colors!=null && colors.length!=0)?Color(colors[1]):MyTheme.grey300,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 17
                                   ),
@@ -1818,7 +1808,7 @@ class _LandingPageState extends State<LandingPage> {
                                   overflow: TextOverflow.fade,
                                   maxLines: 1,
                                   style: TextStyle(
-                                      color: (colors!=null?Color(colors[1]):MyTheme.grey300).withOpacity(.8),
+                                      color: ((colors!=null && colors.length!=0)?Color(colors[1]):MyTheme.grey300).withOpacity(.8),
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15
                                   ),
@@ -1903,6 +1893,9 @@ class _LandingPageState extends State<LandingPage> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 

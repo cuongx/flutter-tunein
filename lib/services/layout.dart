@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
-import 'package:preload_page_view/preload_page_view.dart';
+//import 'package:preload_page_view/preload_page_view.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:Tunein/services/pageService.dart';
 
@@ -49,7 +49,7 @@ class LayoutService {
   void _initSubPageViews() {
     _pageServices = List<PageService>(4);
     for (var i = 0; i < _pageServices.length; i++) {
-      _pageServices[i] = PageService(i, Controller: i==0?PreloadPageController():null);
+      _pageServices[i] = PageService(i, Controller: i==0?PageController(keepPage: true):null);
     }
   }
 

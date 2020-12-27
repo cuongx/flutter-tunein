@@ -25,13 +25,14 @@ class PlaylistsPage extends StatefulWidget {
   _PlaylistsPageState createState() => _PlaylistsPageState();
 }
 
-class _PlaylistsPageState extends State<PlaylistsPage> {
+class _PlaylistsPageState extends State<PlaylistsPage> with AutomaticKeepAliveClientMixin<PlaylistsPage> {
   String newPlaylistName;
   final musicService = locator<MusicService>();
   ScrollController controller = new ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       alignment: Alignment.center,
       color: MyTheme.darkBlack,
@@ -331,5 +332,10 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
           fullscreenDialog: true
       ),
     );*/
+  }
+
+  @override
+  bool get wantKeepAlive {
+    return true;
   }
 }

@@ -18,7 +18,16 @@ import 'package:Tunein/utils/messaginUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-class SettingsPage extends StatelessWidget {
+
+class SettingsPage extends StatefulWidget {
+  PageController controller;
+  SettingsPage({Key key, controller}) : this.controller = controller != null ? controller : new PageController(), super(key: key);
+
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+
+class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClientMixin<SettingsPage> {
 
   final SettingService = locator<settingService>();
   final layoutService = locator<LayoutService>();
@@ -26,9 +35,9 @@ class SettingsPage extends StatelessWidget {
   final musicService = locator<MusicService>();
 
 
-
   @override
   Widget build(BuildContext gcontext) {
+    super.build(gcontext);
     Size screenSize = MediaQuery.of(gcontext).size;
     return Material(
       color: MyTheme.darkBlack,
@@ -676,6 +685,11 @@ class SettingsPage extends StatelessWidget {
         });
   }
 
+
+  @override
+  bool get wantKeepAlive {
+    return true;
+  }
 
   Future<bool> openNetworkOpenFileList(context){
     return DialogService.showAlertDialog(context,

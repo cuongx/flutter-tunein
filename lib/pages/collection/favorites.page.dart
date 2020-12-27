@@ -17,8 +17,8 @@ class _FavoritesPageState extends State<FavoritesPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var size = MediaQuery.of(context).size;
-
     final double itemWidth = size.width / 2;
     return Container(
       padding: EdgeInsets.only(bottom: 85),

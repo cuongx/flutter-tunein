@@ -566,7 +566,7 @@ class _AlbumTagsState extends State<AlbumTags> {
                                           );
                                           if(selectedAlbum!=null){
                                             setState(() {
-                                              setNewAlbum(selectedAlbum);
+                                              //setNewAlbum(selectedAlbum);
                                             });
                                           }
                                         });
@@ -923,7 +923,7 @@ class _AlbumTagsState extends State<AlbumTags> {
                           margin: EdgeInsets.only(top: 8),
                           child: TextField(
                             onChanged: (string){
-                              this.lyrics=string;
+                              //this.lyrics=string;
                             },
                             style: TextStyle(
                               color: Colors.white,

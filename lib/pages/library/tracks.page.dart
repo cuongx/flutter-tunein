@@ -102,6 +102,7 @@ class _TracksPageState extends State<TracksPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final screensize = MediaQuery.of(context).size;
 
     double getSongPosition(int indexOfThePlayingSong,double numberOfSongsPerScreen){

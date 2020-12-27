@@ -50,12 +50,10 @@ class SideDrawerComponent extends StatelessWidget {
           borderRadius: 10,
           leftAnimationType: InnerDrawerAnimation.static,
           rightAnimationType: InnerDrawerAnimation.quadratic,
-          backgroundDecoration: BoxDecoration(color: dataON && data.value.colors.length!=0?Color(data.value.colors[0]):Colors.red,  ),
-
+          backgroundDecoration: BoxDecoration(color: dataON && data.value.colors.length!=0?Color(data.value.colors[0]):MyTheme.bgBottomBar,  ),
           onDragUpdate: (double val, InnerDrawerDirection direction) {
 
           },
-
           leftChild: Material(
             color: Colors.transparent,
             child: dataON?Container(
@@ -67,6 +65,9 @@ class SideDrawerComponent extends StatelessWidget {
                       child: Material(
                         color: Colors.transparent,
                         child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10))
+                          ),
                           padding: EdgeInsets.all(5),
                           child: FadeInImage(
                             placeholder: AssetImage('images/track.png'),
@@ -189,13 +190,6 @@ class SideDrawerComponent extends StatelessWidget {
                 automaticallyImplyLeading: false
             ),
           ),
-          /* OR
-            CupertinoPageScaffold(
-                navigationBar: CupertinoNavigationBar(
-                    automaticallyImplyLeading: false
-                ),
-            ),
-            */
         );
       },
     );
@@ -208,6 +202,5 @@ class SideDrawerComponent extends StatelessWidget {
         builder: (context) => AboutTuneInPage(),
       ),
     );
-
   }
 }

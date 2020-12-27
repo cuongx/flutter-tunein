@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'package:Tunein/components/customPageView.dart';
 import 'package:Tunein/components/drawer/sideDrawer.dart';
 import 'package:Tunein/models/playerstate.dart';
 import 'package:Tunein/pages/collection/collection.page.dart';
@@ -220,12 +221,13 @@ class RootState extends State<Root> with TickerProviderStateMixin {
                               mainAxisSize: MainAxisSize.max,
                               children: <Widget>[
                                 Expanded(
-                                  child: PageView(
+                                  child: CustomPageView(
                                     controller:
                                     layoutService.globalPageController,
                                     physics: NeverScrollableScrollPhysics(),
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
+                                    //scrollDirection: Axis.horizontal,
+                                    shallowWidget: Container(color: MyTheme.bgBottomBar),
+                                    pages: [
                                       LibraryPage(),
                                       CollectionPage(),
                                       SettingsPage()

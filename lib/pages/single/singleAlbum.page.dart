@@ -456,7 +456,6 @@ class SingleAlbumPage extends StatelessWidget {
                                 break;
                               }
                               case 10:{
-                                print("sdqsdfqsdfsqdfqsdFSDFDSQFDSQFDSFQSDFSDQF");
                                 PageRoutes.goToEditTagsPage(album.songs[newIndex], context, subtract60ForBottomBar: true);
                                 break;
                               }
