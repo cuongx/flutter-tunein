@@ -18,6 +18,7 @@ import 'package:Tunein/services/locator.dart';
 import 'package:Tunein/services/musicService.dart';
 import 'package:Tunein/services/themeService.dart';
 import 'package:Tunein/values/contextMenus.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:Tunein/components/ArtistCell.dart';
@@ -372,7 +373,7 @@ class SinglePlaylistPage extends StatelessWidget {
 
   dynamic openEditPlaylistPage(Playlist playlist, context) async{
     ///The returned value will be the list of songs to Delete and the name of the playlist if it is changed (otherwise will be null)
-     MapEntry<List<String>,String> returnedSongsToBeDeleted = await Navigator.of(context).push(
+     Map<String, dynamic> returnedSongsToBeDeleted = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => EditPlaylist(
           playlist: playlist,
@@ -380,22 +381,30 @@ class SinglePlaylistPage extends StatelessWidget {
       ),
     );
 
-     if(returnedSongsToBeDeleted!=null && returnedSongsToBeDeleted.key.length!=0){
+     if(returnedSongsToBeDeleted!=null && returnedSongsToBeDeleted["removedSongsId"]?.length!=0){
        ///Deleting songs based on the returnedSongsToBeDeleted Ids
 
        playlist.songs.removeWhere((song){
 
-         return returnedSongsToBeDeleted.key.contains(song.id);
+         return returnedSongsToBeDeleted["removedSongsId"]?.contains(song.id)??false;
        });
-
-       if(returnedSongsToBeDeleted.value!=null){
-         playlist.name=returnedSongsToBeDeleted.value;
-       }
-
-       savePlaylistToDisk(playlist);
-
-       playlistStream.add(playlist);
      }
+
+     if(returnedSongsToBeDeleted!=null && returnedSongsToBeDeleted["playlist"]!=null){
+       playlist.name=returnedSongsToBeDeleted["playlist"].name;
+     }
+
+
+     savePlaylistToDisk(playlist);
+
+     playlistStream.add(playlist);
+
+     DialogService.showToast(context,
+         backgroundColor: MyTheme.darkBlack,
+         color: MyTheme.grey300,
+         message: "Playlist saved",
+         duration: 2
+     );
   }
 
   Future<bool> openAddSongsToPlaylistPage(Playlist playlist, context)async{

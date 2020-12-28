@@ -1,9 +1,15 @@
+import 'dart:io';
+
+import 'package:Tunein/components/common/ShowWithFadeComponent.dart';
 import 'package:Tunein/components/common/selectableTile.dart';
+import 'package:Tunein/plugins/nano.dart';
 import 'package:Tunein/plugins/upnp.dart';
 import 'package:Tunein/services/castService.dart';
 import 'package:Tunein/services/themeService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
+import 'package:media_gallery/media_gallery.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:upnp/upnp.dart' as upnp;
 import 'locator.dart';
 import 'package:Tunein/globals.dart';
@@ -301,6 +307,218 @@ class DialogService{
 
   }
 
+
+  static Future<dynamic> openImagePickingDialog(context, List<Album> albums){
+    PageController controller= PageController(initialPage: 1);
+    BehaviorSubject<MediaCollection> selectedCollections = new BehaviorSubject<MediaCollection>();
+    int albumItemsPerRow= 3;
+    double height = MediaQuery.of(context).size.height*.60;
+    Widget Content = Container(
+      height: height,
+      width: MediaQuery.of(context).size.width*.90,
+      child: PageView(
+        controller: controller,
+        physics: NeverScrollableScrollPhysics(),
+        children: [
+          GestureDetector(
+            onHorizontalDragEnd: (dragDetails){
+              print(dragDetails.primaryVelocity);
+              if(dragDetails.primaryVelocity<500){
+                controller.animateToPage(1,duration: Duration(milliseconds: 200), curve: Curves.linearToEaseOut);
+              }
+            },
+            child: FutureBuilder(
+              future: Future.sync(() => albums.where((element) => element.albumArt!=null).map((e) => e.albumArt).toList()),
+              builder: (context, AsyncSnapshot<List<String>> snapshot){
+                if(!snapshot.hasData){
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5.0,
+                    ),
+                  );
+                }
+                List<String> urlList = snapshot.data;
+                return Container(
+                  child: GridView.builder(
+                    padding: EdgeInsets.all(0),
+                    itemCount: urlList.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: albumItemsPerRow,
+                      mainAxisSpacing: albumItemsPerRow.toDouble(),
+                      crossAxisSpacing: albumItemsPerRow.toDouble(),
+                      childAspectRatio: (100 / (100 + 50)),
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context, rootNavigator: true).pop(Future.sync(() => File(urlList[index])));
+                        },
+                        child: FadeInImage(
+                          placeholder: AssetImage('images/track.png'),
+                          fadeInDuration: Duration(milliseconds: 200),
+                          fadeOutDuration: Duration(milliseconds: 100),
+                          image: urlList[index] != null
+                              ? FileImage(
+                            new File(urlList[index]),
+                          )
+                              : AssetImage('images/track.png'),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+          Container(
+            child: Column(
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    child: Container(
+                      child: Center(
+                        child: Text("Existent Albums",
+                            style: TextStyle(
+                                color: MyTheme.grey300,
+                                fontSize: 25
+                            )
+                        ),
+                      ),
+                      height: height/2,
+                    ),
+                    onTap: (){
+                      controller.animateToPage(0,duration: Duration(milliseconds: 200), curve: Curves.linearToEaseOut);
+                    },
+                  ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    child: Container(
+                      height: height/2,
+                      child: Center(
+                        child: Text("Photo Library",
+                            style: TextStyle(
+                                color: MyTheme.grey300,
+                                fontSize: 25
+                            )
+                        ),
+                      ),
+                    ),
+                    onTap: (){
+                      controller.animateToPage(2,duration: Duration(milliseconds: 200), curve: Curves.linearToEaseOut);
+                    },
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+          GestureDetector(
+            onHorizontalDragEnd: (dragDetails){
+              print(dragDetails.primaryVelocity);
+              if(dragDetails.primaryVelocity>500){
+                controller.animateToPage(1,duration: Duration(milliseconds: 200), curve: Curves.linearToEaseOut);
+              }
+            },
+            child: FutureBuilder(
+              future: MediaGallery.listMediaCollections(
+                mediaTypes: [MediaType.image, MediaType.video],
+              ),
+              builder: (context, AsyncSnapshot<dynamic> snapshot){
+                if(!snapshot.hasData){
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5.0,
+                    ),
+                  );
+                }
+                List<MediaCollection> collections = snapshot.data;
+                int itemsPerRow= 3;
+                return GridView.builder(
+                  padding: EdgeInsets.all(0),
+                  itemCount: collections.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: itemsPerRow,
+                    mainAxisSpacing: itemsPerRow.toDouble(),
+                    crossAxisSpacing: itemsPerRow.toDouble(),
+                    childAspectRatio: (100 / (100 + 50)),
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () {
+                        selectedCollections.add(collections[index]);
+                        controller.animateToPage(3, duration: Duration(milliseconds: 200), curve: Curves.linearToEaseOut);
+                      },
+                      child: ShowWithFade.fromStream(
+                        inStream: collections[index].getThumbnail(width: 120, height: 135, highQuality: true).then(
+                                (value) => Image.memory(value)
+                        ).asStream(),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          Container(
+              child : GestureDetector(
+                onHorizontalDragEnd: (dragDetails){
+                  print(dragDetails.primaryVelocity);
+                  if(dragDetails.primaryVelocity>500){
+                    controller.animateToPage(2,duration: Duration(milliseconds: 200), curve: Curves.linearToEaseOut);
+                  }
+                },
+                child: StreamBuilder(
+                  stream: selectedCollections.asyncMap((event) => event.getMedias(mediaType: MediaType.image)),
+                  builder: (context, AsyncSnapshot<dynamic> snapshot){
+                    if(!snapshot.hasData){
+                      return Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 5.0,
+                        ),
+                      );
+                    }
+                    MediaPage pageCollections = snapshot.data;
+                    List<Media> mediaCollection = pageCollections.items;
+                    int itemsPerRow= 3;
+                    return GridView.builder(
+                      padding: EdgeInsets.all(0),
+                      itemCount: mediaCollection.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: itemsPerRow,
+                        mainAxisSpacing: itemsPerRow.toDouble(),
+                        crossAxisSpacing: itemsPerRow.toDouble(),
+                        childAspectRatio: (120 / (120 + 50)),
+                      ),
+                      itemBuilder: (BuildContext context, int index) {
+                        int newIndex = (index%itemsPerRow)+2;
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context, rootNavigator: true).pop(mediaCollection[index].getFile());
+                          },
+                          child: ShowWithFade.fromStream(
+                            inStream: mediaCollection[index].getThumbnail(width: 120, height: 135, highQuality: true).then(
+                                    (value) => Image.memory(value)
+                            ).asStream(),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              )
+          )
+        ],
+      ),
+    );
+    return DialogService.showPersistentDialog(context, content:
+    Content,
+        title: "Pick a photo",
+        padding: EdgeInsets.all(12).add(EdgeInsets.only(top:8))
+    );
+  }
 
   static Future<dynamic> showPersistentDialog(context, {String message, Color titleColor, Color messageColor ,String title, Widget content, EdgeInsets padding= const EdgeInsets.all(24), bool showCancelAction = false}){
     return showDialog(
